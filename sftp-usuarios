@@ -1,0 +1,203 @@
+    Crear grupo: sftpgrupo
+groupadd sftpgrupo
+
+    Crear usuario: sftpusuario
+useradd -G sftpgrupo -s /sbin/nologin sftpusuario
+
+    Crear directorio home del usuario, asignar dueño a root y otorgar permisos 775
+mkdir /home/sftpusuario
+chown root:root /home/sftpusuario
+chmod 755 /home/sftpusuario/
+
+    Crear directorio (llamado publico) para el usuario y asignarlo como dueño y también el grupo
+cd /home/sftpusuario/
+mkdir public
+
+chown sftpusuario:sftpgrupo publico
+    Verificación de permisos
+ls -ld /home/sftpusuario/
+ls -ld /home/sftpusuario/public
+
+    Asignar contraseña al usuario
+passwd sftpusuario
+Selinux (Centos y RHEL) y firewall
+setsebool -P ssh_chroot_rw_homedirs on
+
+    Modificar configuración del servicio ssh, archivo etc/ssh/sshd_config
+Comentar la linea archivo etc/ssh/sshd_config
+#Subsystem sftp /usr/lib/openssh/sftp-server
+Adicionar las lineas archivo etc/ssh/sshd_config
+Subsystem       sftp    internal-sftp
+Match Group sftpgrupo
+ChrootDirectory %h
+ForceCommand internal-sftp
+AllowTcpForwarding no
+X11Forwarding no
+
+    Reiniciar el servicio de ssh
+systemctl restart ssh
+
+Verificación de denegación de conexión ssh
+sftpusuario@192.168.4.1
+
+    Cambiar contraseña al usuario
+
+passwd sftpusuario
+
+    Conexión sftp
+
+sftp sftpusuario@192.168.4.1
+
+sftp -oPort=2222 sftpusuario@192.168.4.1
+
+* Filezilla
+
+    Creación usuario normal
+
+adduser usrtest2
+
+Loguear su – usrtest2, pwd, ls -la, ls -la etc/skel/
+
+Loguear ssh -p 2222 usrtest2@192.168.4.1
+
+Loguear sftp -oPort=2222 usrtest2@192.168.4.1
+
+    Modificar shell y asociar a grupo sftpgrupo
+
+sudo usermod -G sftpgrupo -s /sbin/nologin  usrtest2
+
+sudo chown root: root /home/usrtest2
+
+sudo chmod 755 /home/usrtest2
+
+mkdir /home/usrtest2/publico
+
+    Error 1 chown -R root:root /home/sftpusuario
+
+sftp -oPort=2222 usrtest2@192.168.4.1
+
+cd publico
+
+mkdir test
+
+Solución
+
+chown -R sftpusuario:sftpgrupo /home/sftpusuario/publico
+
+    Error 2: cambiar dueño y grupo del home del usuario
+
+chown -R sftpusuario:sftpgrupo /home/sftpusuario
+
+Solución:
+
+chown root:root /home/sftpusuario
+
+chown -R sftpusuario:sftpgrupo /home/sftpusuario/publico
+
+cd /home/sftpusuario
+
+ls -la
+
+chown  root:root ..
+
+    Error 3: Crear el usuario con shell (su – usuario ==> funciona)
+
+Solución:
+
+sudo usermod -s /sbin/nologin usuario
+
+    Error 4: El usuario no queda enjaulado y puede navegador por el sistema (por ej. ls /etc) useradd usrtest3
+
+passwd usrtest3
+
+sftp -oPort=2222 usrtest3@192.168.4.1
+
+ls /etc
+
+Solución:
+
+Mirar grupos del usuario
+
+id  usrtest3
+
+Agregar usuario a grupo sftp (enjaulados)
+
+usermod -aG sftpgrupo usrtest3
+
+mkdir /home/usrtest3
+
+chown root:root /home/usrtest3
+
+chmod 755 /home/usrtest3
+
+mkdir /home/usrtest3/publico
+
+chown usrtest3:sftpgrupo /home/usrtest3/publico
+
+    Error asignar acl al home del usuario, por ejemplo /home/usuario
+
+setfacl -Rm u:usuario1:rwX /home/usuario/
+
+setfacl -Rm u:usuario2:rwX /home/usuario/
+
+Solución:
+
+Borrar acl de un directorio a archivo
+
+setfacl -b /home/usuario/
+
+    Tip eliminar miembro de un grupo
+
+id usuario
+
+sintaxis:
+
+gpasswd -d
+
+ejemplo:
+
+gpasswd -d grupo usuario
+
+    Tip generar backups de acl aplicadas en un directorio
+
+cd /home/usuario/
+
+getfacl -R * > acls-homepruebadig
+
+    Tip loguear al usuario en un directorio dentro del directorio raíz asignado (funciona para rhel7, para rhel6 y versiones antiguas no funciona, para ver los comandos disponibles ejecutar man sftp-server)
+
+Subsystem       sftp    internal-sftp
+Match Group sftpgrupo
+ChrootDirectory %h
+ForceCommand internal-sftp -d /public
+AllowTcpForwarding no
+X11Forwarding no
+
+
+* Para enjaular un usuario no se requiere el grupo ni los permisos para usuarios y grupo:
+
+Match User falko
+    ChrootDirectory /home
+    AllowTCPForwarding no
+    X11Forwarding no
+    ForceCommand internal-sftp
+
+
+
+
+
+Links
+
+http://landoflinux.com/linux_sftp_chroot_jail.html
+
+http://www.ite.educacion.es/formacion/materiales/85/cd/linux/m1/administracin_de_usuarios_y_grupos.html
+
+http://formacion.intef.es/pluginfile.php/37380/mod_imscp/content/1/administracin_de_usuarios_y_grupos.html
+
+https://www.howtoforge.com/restricting-users-to-sftp-plus-setting-up-chrooted-ssh-sftp-debian-squeeze
+
+https://wiki.archlinux.org/index.php/SFTP_chroot
+
+https://blog.tinned-software.net/setup-sftp-only-account-using-openssh-and-ssh-key/
+
+https://devanswers.co/configure-sftp-web-server-document-root/
