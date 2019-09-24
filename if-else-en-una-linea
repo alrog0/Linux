@@ -1,0 +1,5 @@
+a=1 ; b=2 ; if [ $a -eq $b ] ; then echo "equal" ; else echo "not equal" ; fi
+
+ejemplo:
+
+ipa user-add usuario.apellido --first 'reacreditacion escuela' --last 'administracion empresas agropecuarias' --email 'reacreditacion.empresasagropecuarias@dominio.com' --employeenumber=99999 ; if [ $? -ne 0 ] ; then echo"error usuario: reacreditacion.empresasagropecuarias" ; fi
