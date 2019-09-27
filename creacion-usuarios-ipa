@@ -1,0 +1,24 @@
+Generar export ldap origen:
+
+ldapsearch -h xx.xx.xx.xx -p 1389 -D "cn=Directory Manager" -w <contraseña> -b "ou=people,dc=uptc,dc=edu,dc=co" "(|(uid=b*)(uid=c*)(uid=d*))" cn uid givenName sn mail displayName cedula mailalterno > OU-people-bcd
+
+Convertir (ldapbrowser doftterra) ldif a csv y organizar columnas uid-givenName-sn-mail-displayName-Cedula-CorreoAlterno
+
+columnas excel
+uid	givenName || sn	mail	displayName	Cedula	CorreoAlterno	script
+usuario.apellido || Nombre || Apellidos || correo@dominio || Nombres || <cedula> || correoalterno@dominio
+
+Filtros Notepad++ para limpiar espacios al inicio y final de letras, tabuladores y caracteres especiales (opc2: formula "espacios")
+filtrar \t+$
+filtrar \s+$
+filtrar ^\s
+filtrar ^\t
+filtrar signo ? / \ ' "
+
+Contenido formula - Columna script (al final el if es para escribir en log cuando falla a que usuario hace referencia)
+
+=CONCAT("ipa user-add ";A4;SI((B4<>"");" --first '"&B4&"'";" --last 'SIN NOMBRE'");SI((C4<>"");" --last '"&C4&"'";" --last 'SIN APELLIDO'");SI((D4<>"");" --email '"&D4&"'";"");SI((E4<>"");" --displayname '"&E4&"'";"");SI((F4<>"");" --employeenumber '"&F4&"'";"");SI((G4<>"");" --addattr=mailAlternateAddress='"&G4&"'";"");" ; if [ $? -ne 0 ] ; then echo ";"""";"fallido usuario: ";A4;"""";" ; fi")
+
+Ejecución de script (ejecutar con comando "screen")
+chmod +x script.sh
+./script.sh 2> errores-script.log | tee 1> mensajes-script.log
