@@ -1,0 +1,15 @@
+#!/bin/bash
+find /ruta/ -mtime +20 -iname "wso2carbon.log.*" -print -exec rm -rf {} \;
+find /ruta/ -mtime +20 -iname "http_access_management_console_*" -print -exec rm -rf {} \;
+find /ruta/ -mtime +20 -iname "audit.log.*" -print -exec rm -rf {} \;
+
+
+crontab -l |grep ws
+0 2 * * * sh /root/SCRIPTS/depura_log_wso2.sh
+
+
+permisos script
+ls -la /root/SCRIPTS/depura_log_wso2.sh
+-r-xr-xr--. 1 root root 347 Oct 24 09:49 /root/SCRIPTS/depura_log_wso2.sh
+
+
