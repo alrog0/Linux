@@ -6,7 +6,6 @@ firewall-cmd --permanent --add-port=18080/tcp
 
 cd /opt/jboss/
 mkdir myapp1
-cp standalone/configuration/ myapp1/
 cp -ra standalone/configuration/ myapp1/
 cp -ra standalone/deployments/ myapp1/
 cp -ra standalone/lib/ myapp1/
