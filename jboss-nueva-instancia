@@ -1,0 +1,17 @@
+firewall-cmd --permanent --add-port=9990/tcp
+firewall-cmd --permanent --add-port=8080/tcp
+firewall-cmd --permanent --add-port=19990/tcp
+firewall-cmd --permanent --add-port=18080/tcp
+
+
+cd /opt/jboss/
+mkdir myapp1
+cp standalone/configuration/ myapp1/
+cp -ra standalone/configuration/ myapp1/
+cp -ra standalone/deployments/ myapp1/
+cp -ra standalone/lib/ myapp1/
+
+cambiar a 10000 en /opt/jboss/myapp1/configuration/standalone.xml
+<socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:10000}">
+
+/opt/jboss/bin/standalone.sh -Djboss.server.base.dir=/opt/jboss/myapp1/
