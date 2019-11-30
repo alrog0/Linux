@@ -8,5 +8,6 @@ gsettings set org.gnome.shell.extensions.dash-to-dock show-apps-at-top true
 
 
 https://www.linuxbabe.com/ubuntu/4-tips-speed-up-ubuntu-16-04
+https://www.hecticgeek.com/2012/06/few-things-to-speed-up-ubuntu/
 tar cvfz /root/etc-xdg-autostart.tar.gz /etc/xdg/autostart/*.desktop
 sed -i 's/NoDisplay=true/NoDisplay=false/g' /etc/xdg/autostart/*.desktop
