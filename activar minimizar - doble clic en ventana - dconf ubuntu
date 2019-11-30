@@ -16,3 +16,11 @@ https://www.hecticgeek.com/2012/06/few-things-to-speed-up-ubuntu/
 grep -ir "NoDisplay=true" /etc/xdg/autostart/*.desktop
 tar cvfz /root/etc-xdg-autostart.tar.gz /etc/xdg/autostart/*.desktop
 sed -i 's/NoDisplay=true/NoDisplay=false/g' /etc/xdg/autostart/*.desktop
+
+
+
+
+
+Open Settings from left panel or application menu.
+When it opens, navigate to Devices -> Keyboard.
+Scroll down and find out the line “Switch windows“, then click and set its keyboard shortcut to Alt+Tab.
