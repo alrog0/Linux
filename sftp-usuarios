@@ -1,4 +1,7 @@
-    Crear grupo: sftpgrupo
+En red hat 5 no se soporta sftp enjaulado
+https://access.redhat.com/solutions/21954
+
+Crear grupo: sftpgrupo
 groupadd sftpgrupo
 
     Crear usuario: sftpusuario
