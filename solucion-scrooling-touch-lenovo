@@ -1,0 +1,18 @@
+https://askubuntu.com/questions/1053720/scrolling-not-working-after-suspend-looking-for-permanent-solution
+
+After some digging I used a combination of your solution and this answer.
+
+On Ubuntu 18.04, I placed the following script in /lib/systemd/system-sleep/psmouse-refresh. This reloads the module after suspend.
+
+#!/bin/bash
+
+# $1 is the state (pre or post)-sleep
+if [[ $1 == post ]]; then
+    modprobe -r psmouse
+    modprobe psmouse
+fi
+
+make it executable
+
+chmod +x /lib/systemd/system-sleep/psmouse-refresh
+
