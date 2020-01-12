@@ -1,0 +1,82 @@
+#!/bin/bash
+# link https://www.redhat.com/sysadmin/configuring-ansible
+# 1. crear script en host de control /tmp/script-reporte-usuarios.sh con el siguiente contenido:
+
+# 2. generar lista de usuarios con shell bash o sh, y omitiendo usuarios sshd y shutdown, e imprimiendo los campos uid y comment
+grep -E 'bash|sh' /etc/passwd | grep -v sshd | grep -v shutd | cut -d ":" -f1,5 > /tmp/reporte-usuarios
+
+# 3. organizar lista de usuarios 
+sort /tmp/reporte-usuarios > /tmp/reporte-usuarios-uid-cm
+
+# 4.  Generar lista con uid de cada usuario
+cut -d ":" -f1 /tmp/reporte-usuarios-uid-cm > /tmp/reporte-usuarios-uid
+
+# 5. Validar que el grupo wheel no este con comentario, para luego contar los miembros como usuarios con permisos sudo
+#check_gr_wheel=$(grep -Eir '^%wheel' /etc/sudoers* | wc -l)
+grep -Eir '^%wheel' /etc/sudoers* | wc -l > /tmp/reporte-usuarios-check_gr_wheel
+
+# 6. Si el grupo wheel no esta comentado, los miembros se añaden a archivo de usuarios con permisos sudo, y se reemplaza la coma, por nueva linea
+if [ $(< /tmp/reporte-usuarios-check_gr_wheel) -gt 0 ]; then
+        grep wheel /etc/group | cut -d ":" -f4 | sed 's/\,/\n/g' > /tmp/reporte-usuarios-su
+        grep -ir "ALL=" /etc/sudoers* | grep -v "#" |grep -v "%" | cut -d ":" -f2 | awk '{print $1}' >> /tmp/reporte-usuarios-su
+else
+        Generar listado de usuarios com permisos ALL= en el archivo /etc/sudoers* sin incluir grupo wheel
+        grep -ir "ALL=" /etc/sudoers* | grep -v "#" |grep -v "%" | cut -d ":" -f2 | awk '{print $1}' > /tmp/reporte-usuarios-su
+fi
+
+# 7. Ordenar lista de usuarios con permisos sudo y eliminar duplicados
+sort /tmp/reporte-usuarios-su | uniq > /tmp/reporte-usuarios-sudo
+
+# 8. iterar lista completa de usuarios contra lista de permisos con sudo y contar resultado en cada iteración, si es 0 no tiene sudo, si es 1 tiene sudo
+for itr1 in $(cat /tmp/reporte-usuarios-uid) ; do
+    grep -i $itr1 /tmp/reporte-usuarios-sudo | wc -l >> /tmp/reporte-usuarios-sudo-chk
+done
+
+# 9. unir archivo con uid + comment y archivo con validacion de sudo
+paste -d : /tmp/reporte-usuarios-uid-cm /tmp/reporte-usuarios-sudo-chk > /tmp/reporte-usuarios-temp
+
+# 10. Añadir al principio de cada linea dos puntos (despues sera usado para aplicar texto en columnas en excel)
+sed 's/^/:/g' /tmp/reporte-usuarios-temp > /tmp/ok-reporte-usuarios
+
+# 11. borrar archivos temporales
+rm -rf /tmp/reporte-usuarios*
+
+# 12. imprimir reporte de usuarios
+cat /tmp/ok-reporte-usuarios
+
+
+
+
+## llevar resultado a excel y separar texto por :
+## reemplazar en columna 3 "1" por "SI"; y "0" por "NO"
+##
+
+# archivo /home/user/inventory
+[all]
+192.168.122.36
+
+# archivo ansible.cfg
+inventory      = /home/user/inventory
+privilege_escalation]
+become=True
+become_method=sudo
+become_user=root
+become_ask_pass=False
+
+# archivo /home/user/setup.yml
+
+---
+- name: Transfer and execute a script.
+  hosts: all
+  tasks:
+     - name: Transfer the script
+       copy: src=/tmp/script-reporte-usuarios.sh dest=/tmp/script-reporte-usuarios.sh mode=0777
+
+     - name: Execute the script
+       command: bash /tmp/script-reporte-usuarios.sh
+
+# ejecución playbook
+ansible-playbook setup.yml
+
+# ejecución ansible ad-hoc para imprimir resultado
+ansible all -m shell -a 'cat /tmp/ok-reporte-usuarios'
