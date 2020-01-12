@@ -1,4 +1,5 @@
 #!/bin/bash
+# link https://www.redhat.com/sysadmin/configuring-ansible
 # crear script en host de control /tmp/script-reporte-usuarios.sh con el siguiente contenido:
 
 # 1. generar lista de usuarios con bash o shell y omitiendo usuarios sshd y shutdown, e imprimiendo los campos uid y comment
