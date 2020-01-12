@@ -41,7 +41,7 @@ become_method=sudo
 become_user=root
 become_ask_pass=False
 
-# archivo setup.yml
+# archivo /home/allnx/setup.yml
 
 ---
 - name: Transfer and execute a script.
