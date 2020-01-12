@@ -21,7 +21,7 @@ done
 # 8. unir archivo con uid + comment y archivo con validacion de sudo
 paste -d : /tmp/reporte-usuarios-uid-cm /tmp/reporte-usuarios-sudo-chk > /tmp/ok-reporte-usuarios
 # 9. borrar archivos temporales
-rm -rvf /tmp/reporte-usuarios-* /tmp/new-reporte-usuarios-*
+rm -rvf /tmp/reporte-usuarios*
 # 10. imprimir reporte de usuarios
 cat /tmp/ok-reporte-usuarios
 
