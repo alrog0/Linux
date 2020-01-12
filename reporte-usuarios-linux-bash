@@ -1,4 +1,6 @@
 #!/bin/bash
+# crear script en host de control /tmp/script-reporte-usuarios.sh con el siguiente contenido:
+
 # 1. generar lista de usuarios con bash o shell y omitiendo usuarios sshd y shutdown, e imprimiendo los campos uid y comment
 grep -e bash -e sh /etc/passwd | grep -v sshd | grep -v shutd | cut -d ":" -f1,5 > /tmp/reporte-usuarios
 # 2. organizar lista de usuarios 
@@ -22,10 +24,14 @@ rm -rvf /tmp/reporte-usuarios-* /tmp/new-reporte-usuarios-*
 # 10. imprimir reporte de usuarios
 cat /tmp/ok-reporte-usuarios
 
+
 ## llevar resultado a excel y separar texto por :
 ## reemplazar en columna 3 "1" por "SI"; y "0" por "NO"
 ##
 
+# archivo /home/allnx/inventory
+[all]
+192.168.122.36
 
 # archivo ansible.cfg
 inventory      = /home/allnx/inventory
@@ -42,10 +48,10 @@ become_ask_pass=False
   hosts: all
   tasks:
      - name: Transfer the script
-       copy: src=/tmp/prueba.sh dest=/tmp/prueba.sh mode=0777
+       copy: src=/tmp/script-reporte-usuarios.sh dest=/tmp/script-reporte-usuarios.sh mode=0777
 
      - name: Execute the script
-       command: sh /tmp/prueba.sh
+       command: bash /tmp/script-reporte-usuarios.sh
 
 # ejecución playbook
 ansible-playbook setup.yml
