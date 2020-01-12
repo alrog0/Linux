@@ -17,11 +17,11 @@ grep -Eir '^%wheel' /etc/sudoers* | wc -l > /tmp/reporte-usuarios-check_gr_wheel
 
 # 6. Si el grupo wheel no esta comentado, los miembros se añaden a archivo de usuarios con permisos sudo, y se reemplaza la coma, por nueva linea
 if [ $(< /tmp/reporte-usuarios-check_gr_wheel) -gt 0 ]; then
-        grep wheel /etc/group | cut -d ":" -f4 | sed 's/\,/\n/g' > /tmp/reporte-usuarios-su
-        grep -ir "ALL=" /etc/sudoers* | grep -v "#" |grep -v "%" | cut -d ":" -f2 | awk '{print $1}' >> /tmp/reporte-usuarios-su
+	grep wheel /etc/group | cut -d ":" -f4 | sed 's/\,/\n/g' > /tmp/reporte-usuarios-su
+	grep -ir "ALL=" /etc/sudoers* | grep -v "#" |grep -v "%" | cut -d ":" -f2 | awk '{print $1}' >> /tmp/reporte-usuarios-su
 else
-        Generar listado de usuarios com permisos ALL= en el archivo /etc/sudoers* sin incluir grupo wheel
-        grep -ir "ALL=" /etc/sudoers* | grep -v "#" |grep -v "%" | cut -d ":" -f2 | awk '{print $1}' > /tmp/reporte-usuarios-su
+	Generar listado de usuarios com permisos ALL= en el archivo /etc/sudoers* sin incluir grupo wheel
+	grep -ir "ALL=" /etc/sudoers* | grep -v "#" |grep -v "%" | cut -d ":" -f2 | awk '{print $1}' > /tmp/reporte-usuarios-su
 fi
 
 # 7. Ordenar lista de usuarios con permisos sudo y eliminar duplicados
@@ -43,8 +43,6 @@ rm -rf /tmp/reporte-usuarios*
 
 # 12. imprimir reporte de usuarios
 cat /tmp/ok-reporte-usuarios
-
-
 
 
 ## llevar resultado a excel y separar texto por :
