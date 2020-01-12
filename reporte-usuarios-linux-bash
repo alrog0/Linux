@@ -1,0 +1,23 @@
+#!/bin/bash
+# 1. generar lista de usuarios con bash o shell y omitiendo usuarios sshd y shutdown, e imprimiendo los campos uid y comment
+grep -e bash -e sh /etc/passwd | grep -v sshd | grep -v shutd | cut -d ":" -f1,5 > /tmp/reporte-usuarios
+# 2. organizar lista de usuarios 
+sort /tmp/reporte-usuarios > /tmp/reporte-usuarios-uid-cm
+# 3.  Generar lista con uid de cada usuario
+cut -d ":" -f1 /tmp/reporte-usuarios-uid-cm > /tmp/reporte-usuarios-uid
+# 4. Generar listado de usuarios pertenecientes al grupo wheel y reemplazar la coma por nueva linea
+grep wheel /etc/group | cut -d ":" -f4 | sed 's/\,/\n/g' > /tmp/reporte-usuarios-su
+# 5. Generar listado de usuarios com permisos ALL= en el archivo /etc/sudoers* y unirlo - añadir resultado a archivo generado en paso 4
+grep -ir "ALL=" /etc/sudoers* | grep -v "#" |grep -v "%" | cut -d ":" -f2 | awk '{print $1}' >> /tmp/reporte-usuarios-su
+# 6. Ordenar lista de usuarios y eliminar duplicados
+sort /tmp/reporte-usuarios-su | uniq > /tmp/reporte-usuarios-sudo
+# 7. iterar lista completa de usuarios contra lista de permisos con sudo y contar resultado, si es 0 no tiene sudo, si es 1 tiene sudo
+for itr1 in $(cat /tmp/reporte-usuarios-uid) ; do
+    grep -i $itr1 /tmp/reporte-usuarios-sudo | wc -l >> /tmp/reporte-usuarios-sudo-chk
+done
+# 8. unir archivo con uid + comment y archivo con validacion de sudo
+paste -d : /tmp/reporte-usuarios-uid-cm /tmp/reporte-usuarios-sudo-chk > /tmp/ok-reporte-usuarios
+# 9. borrar archivos temporales
+rm -rvf /tmp/reporte-usuarios-* /tmp/new-reporte-usuarios-*
+# 10. imprimir reporte de usuarios
+cat /tmp/ok-reporte-usuarios
