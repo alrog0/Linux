@@ -25,3 +25,30 @@ cat /tmp/ok-reporte-usuarios
 ## llevar resultado a excel y separar texto por :
 ## reemplazar en columna 3 "1" por "SI"; y "0" por "NO"
 ##
+
+
+# archivo ansible.cfg
+inventory      = /home/allnx/inventory
+privilege_escalation]
+become=True
+become_method=sudo
+become_user=root
+become_ask_pass=False
+
+# archivo setup.yml
+
+---
+- name: Transfer and execute a script.
+  hosts: all
+  tasks:
+     - name: Transfer the script
+       copy: src=/tmp/prueba.sh dest=/tmp/prueba.sh mode=0777
+
+     - name: Execute the script
+       command: sh /tmp/prueba.sh
+
+# ejecución playbook
+ansible-playbook setup.yml
+
+# ejecución ansible ad-hoc para imprimir resultado
+ansible all -m shell -a 'cat /tmp/ok-reporte-usuarios'
