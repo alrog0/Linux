@@ -30,19 +30,19 @@ cat /tmp/ok-reporte-usuarios
 ## reemplazar en columna 3 "1" por "SI"; y "0" por "NO"
 ##
 
-# archivo /home/allnx/inventory
+# archivo /home/user/inventory
 [all]
 192.168.122.36
 
 # archivo ansible.cfg
-inventory      = /home/allnx/inventory
+inventory      = /home/user/inventory
 privilege_escalation]
 become=True
 become_method=sudo
 become_user=root
 become_ask_pass=False
 
-# archivo /home/allnx/setup.yml
+# archivo /home/user/setup.yml
 
 ---
 - name: Transfer and execute a script.
