@@ -21,3 +21,7 @@ paste -d : /tmp/reporte-usuarios-uid-cm /tmp/reporte-usuarios-sudo-chk > /tmp/ok
 rm -rvf /tmp/reporte-usuarios-* /tmp/new-reporte-usuarios-*
 # 10. imprimir reporte de usuarios
 cat /tmp/ok-reporte-usuarios
+
+## llevar resultado a excel y separar texto por :
+## reemplazar en columna 3 "1" por "SI"; y "0" por "NO"
+##
