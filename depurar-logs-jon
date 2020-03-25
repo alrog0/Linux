@@ -1,0 +1,11 @@
+#!/bin/bash
+# busqueda de logs con fecha de modificación mayor a 31 dias, se comprimen y en el nuevo archivo se nombra con fecha inicial y final de la busqueda, finalmente se borran los archivos encontrados
+DESDE=$(find /opt/jon/jon-server-3.3.0.GA/logs/server.log.* -type f -mtime +15 | head -n1 | cut -d "/" -f6 | cut -d "." -f3)
+HASTA=$(find /opt/jon/jon-server-3.3.0.GA/logs/server.log.* -type f -mtime +15 | tail -n1 | cut -d "/" -f6 | cut -d "." -f3)
+find /opt/jon/jon-server-3.3.0.GA/logs/server.log.* -type f -mtime +15 -exec tar cvfz /opt/jon/jon-server-3.3.0.GA/logs/bk.server.log.$DESDE--$HASTA.tar.gz {} +
+find /opt/jon/jon-server-3.3.0.GA/logs/server.log.* -type f -mtime +15 -delete
+# Borrar archivos comprimidos, con fecha de modificación mayor a un año
+find /opt/jon/jon-server-3.3.0.GA/logs/bk.server.log.* -type f -mtime +365  -delete
+
+###Crontab
+0 6 15,28 * * script.sh
