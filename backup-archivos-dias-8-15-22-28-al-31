@@ -1,0 +1,34 @@
+#!/bin/bash
+DIAACTUAL=$(date +%d)
+calcularbk () {
+         ANIOMES=$(date +%Y%m)
+         FECHA_MENOR=$(date --date="-$1 days" +%Y-%m-%d)
+         FECHA_MAYOR=$(date --date="-$2 days" +%Y-%m-%d)
+         touch /tmp/marca.inicio -d "${FECHA_MENOR}"
+         touch /tmp/marca.fin -d "${FECHA_MAYOR} 23:59"
+         mount -t nfs 10.20.100.150:/REPOSITORIOBK_MANDRAKE /backup
+         find /documentos/temp-rad/plantilla/RADICACION/$ANIOMES/ -maxdepth 1 -mindepth 1 -type d -newer /tmp/marca.inicio ! -newer /tmp/marca.fin > /tmp/listado-directorios-radicacion.txt
+         find /documentos/temp-rad/plantilla/RADICACION/$ANIOMES/ -maxdepth 1 -mindepth 1 -type d -newer /tmp/marca.inicio ! -newer /tmp/marca.fin -exec tar cvfz /backup/server/documentos/temp-rad/plantilla/RADICACION/$FECHA_MENOR--$FECHA_MAYOR.tar.gz {} +
+         #--> pendiente por validar...
+         #--> for i in $(cat /tmp/listado-directorios-radicacion.txt) ; do rm -rf $i/* ; done
+         umount /backup
+     rm -rf /tmp/marca.inicio /tmp/marca.fin /tmp/listado-directorios-radicacion.txt
+}
+
+if [ "${DIAACTUAL}" -eq 08 ] || [ "${DIAACTUAL}" -eq 15 ] || [ "${DIAACTUAL}" -eq 22 ] ; then
+         calcularbk 7 1
+elif [ "${DIAACTUAL}" -eq 28 ] && [ "$(date --date=tomorrow +\%d)" == "01" ]; then
+         calcularbk 6 0
+elif [ "${DIAACTUAL}" -eq 29 ] && [ "$(date --date=tomorrow +\%d)" == "01" ]; then
+         calcularbk 7 0
+elif [ "${DIAACTUAL}" -eq 30 ] && [ "$(date --date=tomorrow +\%d)" == "01" ]; then
+         calcularbk 8 0
+elif [ "${DIAACTUAL}" -eq 31 ] && [ "$(date --date=tomorrow +\%d)" == "01" ]; then
+         calcularbk 9 0
+else
+  echo "nada que hacer" > /dev/null
+fi
+
+Contrab
+# almacenaje y depuración /doc/temp/p/RAD/ dias 8,15,22,28 al 31 ; 10:30pm
+30 22 8,15,22,28-31 * * /root/scripts/procesos/almacenaje-temp-rad--plantilla--RADICACION-1.sh
